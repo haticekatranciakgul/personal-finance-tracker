@@ -43,7 +43,7 @@ function TemplateFrame({
             disableGutters
             sx={{
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               width: '100%',
               p: '8px 12px',
             }}
