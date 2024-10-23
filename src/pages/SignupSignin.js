@@ -7,7 +7,6 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
@@ -16,10 +15,10 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getSignUpTheme from '../components/theme/getSignUpTheme';
 import { GoogleIcon } from '../components/CustomIcons';
 import TemplateFrame from '../components/TemplateFrame';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { toast } from 'react-toastify';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { auth } from '../firebase';
-
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -65,6 +64,9 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loginForm, setLoginForm] = useState(false);
+  const [loading, setLoading] = useState("");
+
 
   // This code only runs on the client side, to determine the system color preference
   React.useEffect(() => {
@@ -92,161 +94,299 @@ export default function SignUp() {
   };
 
   const signupWithEmail = () => {
-
+    setLoading(true);
     console.log("name", name);
     console.log("email", email);
     console.log("password", password);
     console.log("confirmPassword", confirmPassword);
-    
     //Authenticate the user, or basically create a new account using email and pass
+    if (name !== "" && email !== "" && password !== "" && confirmPassword !== "") {
+      if (password == confirmPassword) {
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            // Signed up 
+            const user = userCredential.user;
+            console.log("user", user);
+            toast.success("user created");
+            setLoading(false);
+            setName("");
+            setPassword("");
+            setEmail("");
+            setConfirmPassword("");
+            createDoc(user);
+            //Create a doc with user id as the following id
 
-    if (name !== "" && password !== "" && confirmPassword !== ""){
-      createUserWithEmailAndPassword(auth, email, password)
+          })
+          .catch((error) => {
+            const errorMessage = error.message;
+            toast.error(errorMessage);
+          });
+
+      } else {
+        toast.error("passwprd and confirmpassword don't match!")
+        setLoading(false);
+      }
+
+    } else {
+      toast.error("All needs are mandatory!");
+      setLoading(false);
+    }
+  };
+
+  function loginUsingEmail() {
+    console.log("Email", email);
+    console.log("Password", password);
+
+    if (email !== "" && password !== "" ) {
+
+      signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed up 
+        // Signed in 
         const user = userCredential.user;
-        console.log("user", user);
-        toast.success("user created");
-       
+        toast.success("User Logged In!");
+        console.log("User Logged In : " ,user)
+        // ...
       })
       .catch((error) => {
-        
+        const errorCode = error.code;
         const errorMessage = error.message;
         toast.error(errorMessage);
-        
+        console.log(errorCode)
       });
-    }else{
-      toast.error("All needs are mandatory!")
+    }else {
+      toast.error("All fields are mandatory!")
     }
+  }
 
-
-  };
+  function createDoc(user) {
+    //Make sure that the doc with the uid doesn't exist
+    //Create a doc
+  }
 
   const handleSubmit = (event) => {
     console.log("tıklandı")
   };
 
   return (
-    <TemplateFrame
-      toggleCustomTheme={toggleCustomTheme}
-      showCustomTheme={showCustomTheme}
-      mode={mode}
-      toggleColorMode={toggleColorMode}
-    >
-      <ThemeProvider theme={showCustomTheme ? SignUpTheme : defaultTheme}>
-        <CssBaseline enableColorScheme />
-        <SignUpContainer direction="column" justifyContent="space-between">
-          <Card variant="outlined">
-          
-            <Typography
-              component="h1"
-              variant="h4"
-              sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-            >
-              Sign up
-            </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-            >
-              <FormControl>
-                <FormLabel htmlFor="name">Full name</FormLabel>
-                <TextField
-                  autoComplete="name"
-                  id="name"
-                  state={name}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  fullWidth
-                  placeholder="Jon Snow"
-                
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor="email">Email</FormLabel>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  autoComplete="email"
-                  variant="outlined"
-                  
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor="password">Password</FormLabel>
-                <TextField
-                  required
-                  fullWidth
-                  id="password"
-                  placeholder="••••••"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
-                  variant="outlined"
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor="password">Confirm Password</FormLabel>
-                <TextField
-                  required
-                  fullWidth
-                  placeholder="••••••"
-                  type="password"
-                  id="confirmpassword"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  autoComplete="new-password"
-                  variant="outlined"
-                />
-              </FormControl>
-              <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive updates via email."
-              />
-              <Button
-                
-                fullWidth
-                variant="contained"
-                onClick={signupWithEmail}
-              >
-                Sign up
-              </Button>
-              <Typography sx={{ textAlign: 'center' }}>
-                Already have an account?{' '}
-                <span>
-                  <Link
-                    href="/material-ui/getting-started/templates/sign-in/"
-                    variant="body2"
-                    sx={{ alignSelf: 'center' }}
+    <>
+      {loginForm ?
+        <>
+          {/* login */}
+          <TemplateFrame
+            toggleCustomTheme={toggleCustomTheme}
+            showCustomTheme={showCustomTheme}
+            mode={mode}
+            toggleColorMode={toggleColorMode}
+          ><ToastContainer />
+            <ThemeProvider theme={showCustomTheme ? SignUpTheme : defaultTheme}>
+              <CssBaseline enableColorScheme />
+              <SignUpContainer direction="column" justifyContent="space-between">
+                <Card variant="outlined">
+                  <Typography
+                    component="h1"
+                    variant="h4"
+                    sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
                   >
-                    Sign in
-                  </Link>
-                </span>
-              </Typography>
-            </Box>
-            <Divider>
-              <Typography sx={{ color: 'text.secondary' }}>or</Typography>
-            </Divider>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => alert('Sign up with Google')}
-                startIcon={<GoogleIcon />}
-              >
-                Sign up with Google
-              </Button>
-            </Box>
-          </Card>
-        </SignUpContainer>
-      </ThemeProvider>
-    </TemplateFrame>
+                    Login on
+                  </Typography>
+                  <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                  >
+
+                    <FormControl>
+                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <TextField
+                        required
+                        fullWidth
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        autoComplete="email"
+                        variant="outlined"
+
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="password">Password</FormLabel>
+                      <TextField
+                        required
+                        fullWidth
+                        id="password"
+                        placeholder="••••••"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="new-password"
+                        variant="outlined"
+                      />
+                    </FormControl>
+                    <FormControlLabel
+                      control={<Checkbox value="allowExtraEmails" color="primary" />}
+                      label="I want to receive updates via email."
+                    />
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      onClick={loginUsingEmail}
+                      text={loading ? "Loading..." : "Login Using Email and Password"}
+
+                    >
+                      Login
+                    </Button>
+                    <Typography sx={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setLoginForm(!loginForm)}>
+                      Don't have an account?
+                      <span>
+
+                        Sign up
+
+                      </span>
+                    </Typography>
+                  </Box>
+                  <Divider>
+                    <Typography sx={{ color: 'text.secondary' }}>or</Typography>
+                  </Divider>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      onClick={() => alert('Sign up with Google')}
+                      startIcon={<GoogleIcon />}
+                      text={loading ? "Loading..." : "Loging Using Google"}
+                    >
+                      Login with Google
+                    </Button>
+                  </Box>
+                </Card>
+              </SignUpContainer>
+            </ThemeProvider>
+          </TemplateFrame>
+        </> :
+        <>
+          {/* signup */}
+          <TemplateFrame
+            toggleCustomTheme={toggleCustomTheme}
+            showCustomTheme={showCustomTheme}
+            mode={mode}
+            toggleColorMode={toggleColorMode}
+          ><ToastContainer />
+            <ThemeProvider theme={showCustomTheme ? SignUpTheme : defaultTheme}>
+              <CssBaseline enableColorScheme />
+              <SignUpContainer direction="column" justifyContent="space-between">
+                <Card variant="outlined">
+
+                  <Typography
+                    component="h1"
+                    variant="h4"
+                    sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+                  >
+                    Sign up
+                  </Typography>
+                  <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                  >
+                    <FormControl>
+                      <FormLabel htmlFor="name">Full name</FormLabel>
+                      <TextField
+                        autoComplete="name"
+                        id="name"
+                        state={name}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        fullWidth
+                        placeholder="Jon Snow"
+
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <TextField
+                        required
+                        fullWidth
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        autoComplete="email"
+                        variant="outlined"
+
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="password">Password</FormLabel>
+                      <TextField
+                        required
+                        fullWidth
+                        id="password"
+                        placeholder="••••••"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="new-password"
+                        variant="outlined"
+                      />
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel htmlFor="password">Confirm Password</FormLabel>
+                      <TextField
+                        required
+                        fullWidth
+                        placeholder="••••••"
+                        type="password"
+                        id="confirmpassword"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
+                        variant="outlined"
+                      />
+                    </FormControl>
+                    <FormControlLabel
+                      control={<Checkbox value="allowExtraEmails" color="primary" />}
+                      label="I want to receive updates via email."
+                    />
+                    <Button
+
+                      fullWidth
+                      variant="contained"
+                      onClick={signupWithEmail}
+                      text={loading ? "Loading..." : "Signup Using Email and Password"}
+                    >
+                      Sign up
+                    </Button>
+                    <Typography sx={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setLoginForm(!loginForm)}>
+                      Already have an account?{' '}
+                      <span>
+
+                        Login in
+
+                      </span>
+                    </Typography>
+                  </Box>
+                  <Divider>
+                    <Typography sx={{ color: 'text.secondary' }}>or</Typography>
+                  </Divider>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      onClick={() => alert('Sign up with Google')}
+                      startIcon={<GoogleIcon />}
+                      text={loading ? "Loading..." : "Signup Using Google"}
+                    >
+                      Sign up with Google
+                    </Button>
+                  </Box>
+                </Card>
+              </SignUpContainer>
+            </ThemeProvider>
+          </TemplateFrame>
+        </>
+      }
+    </>
   );
 }
