@@ -96,6 +96,8 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
+
+
 const Skeleton = styled('div')(({ theme, height }) => ({
   backgroundColor: theme.palette.action.hover,
   borderRadius: theme.shape.borderRadius,
@@ -107,7 +109,31 @@ function Main(props) {
 
   const { window } = props;
 
-  const router = useDemoRouter('/dashboard');
+  const [session, setSession] = React.useState({
+    user: {
+      name: 'Bharat Kashyap',
+      email: 'bharatkashyap@outlook.com',
+      image: 'https://avatars.githubusercontent.com/u/19550456',
+    },
+  });
+  const authentication = React.useMemo(() => {
+    return {
+      signIn: () => {
+        setSession({
+          user: {
+            name: 'Bharat Kashyap',
+            email: 'bharatkashyap@outlook.com',
+            image: 'https://avatars.githubusercontent.com/u/19550456',
+          },
+        });
+      },
+      signOut: () => {
+        setSession(null);
+      },
+    };
+  }, []);
+
+  const router = useDemoRouter('/');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window ? window() : undefined;
@@ -117,6 +143,8 @@ function Main(props) {
       router={router}
       theme={demoTheme}
       window={demoWindow}
+      session={session}
+      authentication={authentication}
     >
       <DashboardLayout>
         <CustomDashboardContainer>

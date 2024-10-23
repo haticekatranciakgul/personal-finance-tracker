@@ -29,9 +29,9 @@ function TemplateFrame({
   toggleColorMode,
   children,
 }) {
-  const handleChange = (event) => {
-    toggleCustomTheme(event.target.value === 'custom');
-  };
+  // const handleChange = (event) => {
+  //   toggleCustomTheme(event.target.value === 'custom');
+  // };
   const signUpTheme = createTheme(getSignUpTheme(mode));
 
   return (

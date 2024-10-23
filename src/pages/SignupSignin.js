@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from "react";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -14,8 +14,12 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getSignUpTheme from '../components/theme/getSignUpTheme';
-import { GoogleIcon, FacebookIcon } from '../components/CustomIcons';
+import { GoogleIcon } from '../components/CustomIcons';
 import TemplateFrame from '../components/TemplateFrame';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { toast } from 'react-toastify';
+import { auth } from '../firebase';
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -56,12 +60,12 @@ export default function SignUp() {
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const defaultTheme = createTheme({ palette: { mode } });
   const SignUpTheme = createTheme(getSignUpTheme(mode));
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   // This code only runs on the client side, to determine the system color preference
   React.useEffect(() => {
     // Check if there is a preferred mode in localStorage
@@ -87,55 +91,39 @@ export default function SignUp() {
     setShowCustomTheme((prev) => !prev);
   };
 
-  const validateInputs = () => {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    const name = document.getElementById('name');
+  const signupWithEmail = () => {
 
-    let isValid = true;
+    console.log("name", name);
+    console.log("email", email);
+    console.log("password", password);
+    console.log("confirmPassword", confirmPassword);
+    
+    //Authenticate the user, or basically create a new account using email and pass
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
+    if (name !== "" && password !== "" && confirmPassword !== ""){
+      createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed up 
+        const user = userCredential.user;
+        console.log("user", user);
+        toast.success("user created");
+       
+      })
+      .catch((error) => {
+        
+        const errorMessage = error.message;
+        toast.error(errorMessage);
+        
+      });
+    }else{
+      toast.error("All needs are mandatory!")
     }
 
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
 
-    if (!name.value || name.value.length < 1) {
-      setNameError(true);
-      setNameErrorMessage('Name is required.');
-      isValid = false;
-    } else {
-      setNameError(false);
-      setNameErrorMessage('');
-    }
-
-    return isValid;
   };
 
   const handleSubmit = (event) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    console.log("tıklandı")
   };
 
   return (
@@ -149,7 +137,7 @@ export default function SignUp() {
         <CssBaseline enableColorScheme />
         <SignUpContainer direction="column" justifyContent="space-between">
           <Card variant="outlined">
-            
+          
             <Typography
               component="h1"
               variant="h4"
@@ -166,14 +154,14 @@ export default function SignUp() {
                 <FormLabel htmlFor="name">Full name</FormLabel>
                 <TextField
                   autoComplete="name"
-                  name="name"
+                  id="name"
+                  state={name}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                   fullWidth
-                  id="name"
                   placeholder="Jon Snow"
-                  error={nameError}
-                  helperText={nameErrorMessage}
-                  color={nameError ? 'error' : 'primary'}
+                
                 />
               </FormControl>
               <FormControl>
@@ -182,13 +170,12 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  name="email"
                   autoComplete="email"
                   variant="outlined"
-                  error={emailError}
-                  helperText={emailErrorMessage}
-                  color={passwordError ? 'error' : 'primary'}
+                  
                 />
               </FormControl>
               <FormControl>
@@ -196,15 +183,27 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
-                  name="password"
+                  id="password"
                   placeholder="••••••"
                   type="password"
-                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
                   variant="outlined"
-                  error={passwordError}
-                  helperText={passwordErrorMessage}
-                  color={passwordError ? 'error' : 'primary'}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="password">Confirm Password</FormLabel>
+                <TextField
+                  required
+                  fullWidth
+                  placeholder="••••••"
+                  type="password"
+                  id="confirmpassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  variant="outlined"
                 />
               </FormControl>
               <FormControlLabel
@@ -212,10 +211,10 @@ export default function SignUp() {
                 label="I want to receive updates via email."
               />
               <Button
-                type="submit"
+                
                 fullWidth
                 variant="contained"
-                onClick={validateInputs}
+                onClick={signupWithEmail}
               >
                 Sign up
               </Button>
@@ -243,14 +242,6 @@ export default function SignUp() {
                 startIcon={<GoogleIcon />}
               >
                 Sign up with Google
-              </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => alert('Sign up with Facebook')}
-                startIcon={<FacebookIcon />}
-              >
-                Sign up with Facebook
               </Button>
             </Box>
           </Card>
