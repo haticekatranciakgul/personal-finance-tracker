@@ -15,10 +15,12 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getSignUpTheme from '../components/theme/getSignUpTheme';
 import { GoogleIcon } from '../components/CustomIcons';
 import TemplateFrame from '../components/TemplateFrame';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { auth } from '../firebase';
+import { auth, db, provider } from '../firebase';
+import { useNavigate } from "react-router-dom";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -65,7 +67,8 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loginForm, setLoginForm] = useState(false);
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
 
   // This code only runs on the client side, to determine the system color preference
@@ -107,13 +110,18 @@ export default function SignUp() {
             // Signed up 
             const user = userCredential.user;
             console.log("user", user);
-            toast.success("user created");
+            toast.success("USER created!", {
+              autoClose: 8000, // 5 saniye boyunca göster
+            });
             setLoading(false);
             setName("");
             setPassword("");
             setEmail("");
             setConfirmPassword("");
             createDoc(user);
+            navigate("/dashboard");
+
+
             //Create a doc with user id as the following id
 
           })
@@ -136,39 +144,106 @@ export default function SignUp() {
   function loginUsingEmail() {
     console.log("Email", email);
     console.log("Password", password);
+    setLoading(true);
 
-    if (email !== "" && password !== "" ) {
+    if (email !== "" && password !== "") {
 
       signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        toast.success("User Logged In!");
-        console.log("User Logged In : " ,user)
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        toast.error(errorMessage);
-        console.log(errorCode)
-      });
-    }else {
-      toast.error("All fields are mandatory!")
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          navigate("/dashboard");
+          toast.success("User Logged In!");
+          console.log("User Logged In : ", user);
+          setLoading(false);
+
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setLoading(false);
+          toast.error(errorMessage);
+          console.log(errorCode)
+        });
+    } else {
+      toast.error("All fields are mandatory!");
+      setLoading(false);
     }
   }
 
-  function createDoc(user) {
-    //Make sure that the doc with the uid doesn't exist
-    //Create a doc
+  async function createDoc(user) {
+    setLoading(true);
+    if (!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+    const userData = await getDoc(userRef);
+
+    if (!userData.exists()) {
+      try {
+        await setDoc(doc(db, "users", user.uid), {
+          name: user.displayName ? user.displayName : name,
+          email: user.email,
+          photoURL: user.photoURL ? user.photoURL : "",
+          createdAt: new Date(),
+        });
+        console.log("Doc created!");
+
+        toast.success("Doc createddddd!", {
+          autoClose: 5000, // 5 saniye boyunca göster
+        });
+        setLoading(false);
+
+      } catch (e) {
+        toast.error(e.message);
+        setLoading(false);
+      }
+    } else {
+      toast.error("Doc already exists");
+      setLoading(false);
+    }
   }
 
   const handleSubmit = (event) => {
     console.log("tıklandı")
   };
 
+
+
+  function googleAuth() {
+    setLoading(true);
+    try{
+      signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+        console.log("token", token)
+        console.log("user>>>", user);
+        createDoc(user);
+        navigate("/dashboard");
+        toast.success("User authenticated!")
+
+      }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log("errorCode>>", errorCode)
+        toast.error(errorMessage)
+      });
+
+    }catch(e){
+      toast.error(e.message);
+
+    }
+   
+
+  };
+
+
+
+
   return (
-    <>
+    <><ToastContainer />
       {loginForm ?
         <>
           {/* login */}
@@ -177,7 +252,7 @@ export default function SignUp() {
             showCustomTheme={showCustomTheme}
             mode={mode}
             toggleColorMode={toggleColorMode}
-          ><ToastContainer />
+          >
             <ThemeProvider theme={showCustomTheme ? SignUpTheme : defaultTheme}>
               <CssBaseline enableColorScheme />
               <SignUpContainer direction="column" justifyContent="space-between">
@@ -187,7 +262,7 @@ export default function SignUp() {
                     variant="h4"
                     sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
                   >
-                    Login on
+                    Sign in
                   </Typography>
                   <Box
                     component="form"
@@ -252,7 +327,7 @@ export default function SignUp() {
                     <Button
                       fullWidth
                       variant="outlined"
-                      onClick={() => alert('Sign up with Google')}
+                      onClick={googleAuth}
                       startIcon={<GoogleIcon />}
                       text={loading ? "Loading..." : "Loging Using Google"}
                     >
@@ -373,8 +448,7 @@ export default function SignUp() {
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <Button
                       fullWidth
-                      variant="outlined"
-                      onClick={() => alert('Sign up with Google')}
+                      onClick={googleAuth}
                       startIcon={<GoogleIcon />}
                       text={loading ? "Loading..." : "Signup Using Google"}
                     >
