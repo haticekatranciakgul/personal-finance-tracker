@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useContext } from 'react'
 import { extendTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -9,6 +9,14 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Grid from '@mui/material/Grid2';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase';
+import { Account, SignOutButton } from '@toolpad/core/Account';
+import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { signOut } from 'firebase/auth';
 
 const NAVIGATION = [
   {
@@ -56,6 +64,76 @@ const NAVIGATION = [
   },
 ];
 
+
+function Authentication() {
+  const [user, loading] = useAuthState(auth);
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, loading]);
+
+
+  const [session, setSession] = React.useState({
+    user: {
+      name: 'htc ktrnc',
+      email: 'bharatkashyap@outlook.com',
+      image: 'https://avatars.githubusercontent.com/u/19550456',
+    },
+  });
+  const authentication = React.useMemo(() => {
+    return {
+      signIn: () => {
+        setSession({
+          user: {
+            name: 'htc Kashyap',
+            email: 'bharatkashyap@outlook.com',
+            image: 'https://avatars.githubusercontent.com/u/19550456',
+          },
+        });
+      },
+      signOut: () => {
+        //alert('logout tıklandı');
+        setSession(null);
+       
+      },
+    };
+  }, []);
+
+
+  function logoutFnc() {
+    alert("logout tıklandıhtftgdfgdfgd");
+
+    try{
+      signOut(auth)
+      .then(()=> {
+        toast.success("Logged Out Successfully! ");
+        navigate("/");
+
+      })
+
+    } catch(error) {
+      toast.error(error.message);
+
+    }
+    
+  }
+  return (
+    <AuthenticationContext.Provider value={authentication}>
+      <SessionContext.Provider value={session} >
+        {/* preview-start */}
+        
+          
+        <SignOutButton onClick={logoutFnc}/>
+        {/* preview-end */}
+      </SessionContext.Provider>
+    </AuthenticationContext.Provider>
+  );
+}
+
 // Mevcut stil kodunu burada kullanıyoruz
 const CustomDashboardContainer = styled('div')(({ theme }) => ({
   minHeight: '100vh',
@@ -96,8 +174,6 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
-
-
 const Skeleton = styled('div')(({ theme, height }) => ({
   backgroundColor: theme.palette.action.hover,
   borderRadius: theme.shape.borderRadius,
@@ -107,31 +183,11 @@ const Skeleton = styled('div')(({ theme, height }) => ({
 
 function Main(props) {
 
+
+
   const { window } = props;
 
-  const [session, setSession] = React.useState({
-    user: {
-      name: 'Bharat Kashyap',
-      email: 'bharatkashyap@outlook.com',
-      image: 'https://avatars.githubusercontent.com/u/19550456',
-    },
-  });
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: () => {
-        setSession({
-          user: {
-            name: 'Bharat Kashyap',
-            email: 'bharatkashyap@outlook.com',
-            image: 'https://avatars.githubusercontent.com/u/19550456',
-          },
-        });
-      },
-      signOut: () => {
-        setSession(null);
-      },
-    };
-  }, []);
+
 
   const router = useDemoRouter('/');
 
@@ -143,10 +199,17 @@ function Main(props) {
       router={router}
       theme={demoTheme}
       window={demoWindow}
-      session={session}
-      authentication={authentication}
+      branding={{
+        logo: false,
+        title: 'Personal Finance Tracker',
+      }}
+
+
     >
-      <DashboardLayout>
+
+      <DashboardLayout slots={{ toolbarAccount: Authentication }}
+      >
+
         <CustomDashboardContainer>
           <PageContainer>
 
