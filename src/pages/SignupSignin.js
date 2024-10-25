@@ -131,7 +131,7 @@ export default function SignUp() {
           });
 
       } else {
-        toast.error("passwprd and confirmpassword don't match!")
+        toast.error("password and confirmpassword don't match!")
         setLoading(false);
       }
 
@@ -160,11 +160,13 @@ export default function SignUp() {
           // ...
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
+          toast.error(error.message);
+          console.error(
+            "Error signing in with email and password: ",
+            error.message
+          );
           setLoading(false);
-          toast.error(errorMessage);
-          console.log(errorCode)
+          
         });
     } else {
       toast.error("All fields are mandatory!");

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect } from 'react'
 import { extendTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -8,15 +8,16 @@ import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import Grid from '@mui/material/Grid2';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
-import { Account, SignOutButton } from '@toolpad/core/Account';
+import {  SignOutButton } from '@toolpad/core/Account';
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
-import { ToastContainer, toast } from 'react-toastify';
+import {  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { signOut } from 'firebase/auth';
+import Card from '../components/Card/Card';
+
 
 const NAVIGATION = [
   {
@@ -69,7 +70,6 @@ function Authentication() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
-
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
@@ -103,30 +103,22 @@ function Authentication() {
     };
   }, []);
 
-
   function logoutFnc() {
-    alert("logout tıklandıhtftgdfgdfgd");
-
+    alert("Logged out successfully!");
     try{
       signOut(auth)
       .then(()=> {
         toast.success("Logged Out Successfully! ");
         navigate("/");
-
       })
-
     } catch(error) {
       toast.error(error.message);
-
     }
-    
   }
   return (
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session} >
         {/* preview-start */}
-        
-          
         <SignOutButton onClick={logoutFnc}/>
         {/* preview-end */}
       </SessionContext.Provider>
@@ -174,21 +166,10 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
-const Skeleton = styled('div')(({ theme, height }) => ({
-  backgroundColor: theme.palette.action.hover,
-  borderRadius: theme.shape.borderRadius,
-  height,
-  content: '" "',
-}));
+
 
 function Main(props) {
-
-
-
   const { window } = props;
-
-
-
   const router = useDemoRouter('/');
 
   // Remove this const when copying and pasting into your project.
@@ -203,56 +184,15 @@ function Main(props) {
         logo: false,
         title: 'Personal Finance Tracker',
       }}
+    ><ToastContainer/>
 
-
-    >
-
-      <DashboardLayout slots={{ toolbarAccount: Authentication }}
-      >
-
+      <DashboardLayout slots={{ toolbarAccount: Authentication }}>
         <CustomDashboardContainer>
           <PageContainer>
-
-            <Grid container spacing={1}>
-              <Grid size={5} />
-              <Grid size={12}>
-                <Skeleton height={14} />
-              </Grid>
-              <Grid size={12}>
-                <Skeleton height={14} />
-              </Grid>
-              <Grid size={4}>
-                <Skeleton height={100} />
-              </Grid>
-              <Grid size={8}>
-                <Skeleton height={100} />
-              </Grid>
-
-              <Grid size={12}>
-                <Skeleton height={150} />
-              </Grid>
-              <Grid size={12}>
-                <Skeleton height={14} />
-              </Grid>
-
-              <Grid size={3}>
-                <Skeleton height={100} />
-              </Grid>
-              <Grid size={3}>
-                <Skeleton height={100} />
-              </Grid>
-              <Grid size={3}>
-                <Skeleton height={100} />
-              </Grid>
-              <Grid size={3}>
-                <Skeleton height={100} />
-              </Grid>
-            </Grid>
-
+           <Card/>
           </PageContainer>
         </CustomDashboardContainer>
       </DashboardLayout>
-
     </AppProvider>
   )
 }
