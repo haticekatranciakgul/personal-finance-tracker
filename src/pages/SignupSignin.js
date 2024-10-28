@@ -71,14 +71,12 @@ export default function SignUp() {
   const navigate = useNavigate();
 
 
-  // This code only runs on the client side, to determine the system color preference
+
   React.useEffect(() => {
-    // Check if there is a preferred mode in localStorage
     const savedMode = localStorage.getItem('themeMode');
     if (savedMode) {
       setMode(savedMode);
     } else {
-      // If no preference is found, it uses system preference
       const systemPrefersDark = window.matchMedia(
         '(prefers-color-scheme: dark)',
       ).matches;
@@ -102,16 +100,14 @@ export default function SignUp() {
     console.log("email", email);
     console.log("password", password);
     console.log("confirmPassword", confirmPassword);
-    //Authenticate the user, or basically create a new account using email and pass
     if (name !== "" && email !== "" && password !== "" && confirmPassword !== "") {
       if (password == confirmPassword) {
         createUserWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
-            // Signed up 
             const user = userCredential.user;
             console.log("user", user);
             toast.success("USER created!", {
-              autoClose: 8000, // 5 saniye boyunca göster
+              autoClose: 5000, 
             });
             setLoading(false);
             setName("");
@@ -119,10 +115,7 @@ export default function SignUp() {
             setEmail("");
             setConfirmPassword("");
             createDoc(user);
-            navigate("/dashboard");
-
-
-            //Create a doc with user id as the following id
+            navigate("/");
 
           })
           .catch((error) => {
@@ -140,6 +133,7 @@ export default function SignUp() {
       setLoading(false);
     }
   };
+  
 
   function loginUsingEmail() {
     console.log("Email", email);
@@ -150,14 +144,16 @@ export default function SignUp() {
 
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in 
+          
           const user = userCredential.user;
           navigate("/dashboard");
+
+          toast.success("User Logged In!", {
+            autoClose: 5000, 
+          });
           toast.success("User Logged In!");
           console.log("User Logged In : ", user);
           setLoading(false);
-
-          // ...
         })
         .catch((error) => {
           toast.error(error.message);
@@ -192,7 +188,7 @@ export default function SignUp() {
         console.log("Doc created!");
 
         toast.success("Doc createddddd!", {
-          autoClose: 5000, // 5 saniye boyunca göster
+          autoClose: 5000, 
         });
         setLoading(false);
 
@@ -209,8 +205,6 @@ export default function SignUp() {
   const handleSubmit = (event) => {
     console.log("tıklandı")
   };
-
-
 
   function googleAuth() {
     setLoading(true);
@@ -240,9 +234,6 @@ export default function SignUp() {
    
 
   };
-
-
-
 
   return (
     <><ToastContainer />
