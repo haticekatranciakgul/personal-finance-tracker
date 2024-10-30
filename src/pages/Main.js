@@ -1,10 +1,6 @@
 import React, { useEffect } from 'react'
 import { extendTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import DescriptionIcon from '@mui/icons-material/Description';
-import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -16,7 +12,7 @@ import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider
 import {  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { signOut } from 'firebase/auth';
-import Card from '../components/Card/Card';
+import CardDetail from '../components/Card/CardDetail';
 
 
 const NAVIGATION = [
@@ -25,43 +21,12 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    segment: 'dashboard',
+    
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-  {
     kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 'Analytics',
-  },
-  {
-    segment: 'reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    children: [
-      {
-        segment: 'sales',
-        title: 'Sales',
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: 'traffic',
-        title: 'Traffic',
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
-  {
-    segment: 'integrations',
-    title: 'Integrations',
-    icon: <LayersIcon />,
   },
 ];
 
@@ -189,7 +154,7 @@ function Main(props) {
       <DashboardLayout slots={{ toolbarAccount: Authentication }}>
         <CustomDashboardContainer>
           <PageContainer>
-           <Card/>
+           <CardDetail/>
           </PageContainer>
         </CustomDashboardContainer>
       </DashboardLayout>
