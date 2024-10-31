@@ -1,4 +1,4 @@
-import React, { useEffect, useState }  from 'react'
+import React, { useEffect, useState } from 'react'
 import { extendTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -7,13 +7,15 @@ import { PageContainer } from '@toolpad/core/PageContainer';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
-import {  SignOutButton } from '@toolpad/core/Account';
+import { SignOutButton } from '@toolpad/core/Account';
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
-import {  ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { signOut } from 'firebase/auth';
 import CardDetail from '../components/Card/CardDetail';
-import Modal from '../components/Card/CardDetail'
+import AddExpenseModal from '../components/Modals/addExpense';
+import AddIncomeModal from '../components/Modals/addIncome';
+
 
 const NAVIGATION = [
   {
@@ -22,7 +24,7 @@ const NAVIGATION = [
   },
   {
     title: 'Dashboard',
-    icon: <DashboardIcon />,
+    icon: <DashboardIcon />
   },
   {
     kind: 'divider',
@@ -60,20 +62,20 @@ function Authentication() {
       signOut: () => {
         //alert('logout tıklandı');
         setSession(null);
-       
+
       },
     };
   }, []);
 
   function logoutFnc() {
     alert("Logged out successfully!");
-    try{
+    try {
       signOut(auth)
-      .then(()=> {
-        toast.success("Logged Out Successfully! ");
-        navigate("/");
-      })
-    } catch(error) {
+        .then(() => {
+          toast.success("Logged Out Successfully! ");
+          navigate("/");
+        })
+    } catch (error) {
       toast.error(error.message);
     }
   }
@@ -81,7 +83,7 @@ function Authentication() {
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session} >
         {/* preview-start */}
-        <SignOutButton onClick={logoutFnc}/>
+        <SignOutButton onClick={logoutFnc} />
         {/* preview-end */}
       </SessionContext.Provider>
     </AuthenticationContext.Provider>
@@ -131,9 +133,8 @@ function useDemoRouter(initialPath) {
 function Main(props) {
   const { window } = props;
   const router = useDemoRouter('/');
-  const [isExpenseModalVisible, setIsExpenseModalVisible] = useState(false);
-  const [isIncomeModalVisible, setIsIncomeModalVisible] = useState(false);
-
+  const [isExpenseModalVisible, setIsExpenseModalVisible] = React.useState(false);
+  const [isIncomeModalVisible, setIsIncomeModalVisible] = React.useState(false);
 
 
   const showExpenseModal = () => {
@@ -154,6 +155,11 @@ function Main(props) {
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window ? window() : undefined;
+
+  const onFinish = (values, type) => {
+    console.log('on finishhh', values, type)
+  };
+
   return (
     <AppProvider
       navigation={NAVIGATION}
@@ -164,18 +170,28 @@ function Main(props) {
         logo: false,
         title: 'Personal Finance Tracker',
       }}
-    ><ToastContainer/>
+    ><ToastContainer />
 
       <DashboardLayout slots={{ toolbarAccount: Authentication }}>
         <CustomDashboardContainer>
           <PageContainer>
-           <CardDetail
+            <CardDetail
               showExpenseModal={showExpenseModal}
               showIncomeModal={showIncomeModal}
-           />
-           <Modal visible={isIncomeModalVisible} onCancel={handleIncomeCancel}/>
-           <Modal visible={isExpenseModalVisible} onCancel={handleExpenseCancel}/>
-
+            />
+      
+            <AddExpenseModal
+              isExpenseModalVisible={isExpenseModalVisible}
+              handleExpenseCancel={handleExpenseCancel}
+              onFinish={onFinish}
+              
+            />
+            <AddIncomeModal
+              isIncomeModalVisible={isIncomeModalVisible}
+              handleIncomeCancel={handleIncomeCancel}
+              onFinish={onFinish}
+            />
+            
           </PageContainer>
         </CustomDashboardContainer>
       </DashboardLayout>
