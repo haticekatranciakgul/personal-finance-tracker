@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState }  from 'react'
 import { extendTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -13,7 +13,7 @@ import {  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { signOut } from 'firebase/auth';
 import CardDetail from '../components/Card/CardDetail';
-
+import Modal from '../components/Card/CardDetail'
 
 const NAVIGATION = [
   {
@@ -21,7 +21,6 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
@@ -29,7 +28,6 @@ const NAVIGATION = [
     kind: 'divider',
   },
 ];
-
 
 function Authentication() {
   const [user, loading] = useAuthState(auth);
@@ -40,7 +38,6 @@ function Authentication() {
       navigate("/dashboard");
     }
   }, [user, loading]);
-
 
   const [session, setSession] = React.useState({
     user: {
@@ -131,11 +128,29 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
-
-
 function Main(props) {
   const { window } = props;
   const router = useDemoRouter('/');
+  const [isExpenseModalVisible, setIsExpenseModalVisible] = useState(false);
+  const [isIncomeModalVisible, setIsIncomeModalVisible] = useState(false);
+
+
+
+  const showExpenseModal = () => {
+    setIsExpenseModalVisible(true);
+  };
+
+  const showIncomeModal = () => {
+    setIsIncomeModalVisible(true);
+  };
+
+  const handleExpenseCancel = () => {
+    setIsExpenseModalVisible(false);
+  };
+
+  const handleIncomeCancel = () => {
+    setIsIncomeModalVisible(false);
+  };
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window ? window() : undefined;
@@ -154,7 +169,13 @@ function Main(props) {
       <DashboardLayout slots={{ toolbarAccount: Authentication }}>
         <CustomDashboardContainer>
           <PageContainer>
-           <CardDetail/>
+           <CardDetail
+              showExpenseModal={showExpenseModal}
+              showIncomeModal={showIncomeModal}
+           />
+           <Modal visible={isIncomeModalVisible} onCancel={handleIncomeCancel}/>
+           <Modal visible={isExpenseModalVisible} onCancel={handleExpenseCancel}/>
+
           </PageContainer>
         </CustomDashboardContainer>
       </DashboardLayout>
