@@ -1,4 +1,4 @@
-import React from 'react'
+import React,  { useState } from 'react'
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,11 +10,16 @@ import Button from '@mui/material/Button';
 import FormLabel from '@mui/material/FormLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/system';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
 
 const FormGrid = styled(Grid)(() => ({
     display: 'flex',
     flexDirection: 'column',
 }));
+
+
 
 const style = {
     position: 'absolute',
@@ -31,9 +36,37 @@ const style = {
 function AddIncomeModal({
     isIncomeModalVisible,
     handleIncomeCancel,
+    onFinish,
 
 }) {
 
+    const [tag, setTag] = React.useState('');
+
+
+
+    const [formValues, setFormValues] = useState({
+        name: '',
+        amount: '',
+        date: '',
+    });
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setFormValues({
+            ...formValues,
+            [name]: value,
+        });
+    };
+
+    const handleTagChange = (event) => {
+        setTag(event.target.value);
+    };
+    const handleSubmit = () => {
+        onFinish({ ...formValues, tag }, "income");
+        setFormValues({ name: '', amount: '', date: '' });
+        setTag('');
+        handleIncomeCancel();
+    };
 
     return (
 
@@ -51,15 +84,15 @@ function AddIncomeModal({
                     <CloseIcon />
                 </IconButton>
 
-                <Typography variant='h5' id="modal-modal-description" sx={{ mt: 2 }}>
-                    Add Income 
+                <Typography variant='h5' id="modal-modal-description" sx={{ mt: 2, color: 'text.secondary' }}>
+                    Add Income
                 </Typography>
                 <Divider />
 
 
                 <FormGrid size={{ xs: 12, md: 6 }}>
-                    <FormControl 
-                    sx={{ paddingY:'20px'}}
+                    <FormControl
+                        sx={{ paddingY: '20px' }}
                     >
                         <FormLabel htmlFor="name" required>
                             Name
@@ -71,10 +104,12 @@ function AddIncomeModal({
                             autoComplete="name"
                             required
                             size="small"
+                            value={formValues.name}
+                            onChange={handleChange}
                         />
                     </FormControl>
                     <FormControl
-                    sx={{ paddingBottom:'20px'}}
+                        sx={{ paddingBottom: '20px' }}
                     >
                         <FormLabel htmlFor="amount" required>
                             Amount
@@ -86,10 +121,12 @@ function AddIncomeModal({
                             autoComplete="amount"
                             required
                             size="small"
+                            value={formValues.amount}
+                            onChange={handleChange}
                         />
                     </FormControl>
                     <FormControl
-                    sx={{ paddingBottom:'20px'}}
+                        sx={{ paddingBottom: '20px' }}
                     >
                         <FormLabel htmlFor="Date" required>
                             Date
@@ -101,29 +138,36 @@ function AddIncomeModal({
                             autoComplete="Date"
                             required
                             size="small"
+                            value={formValues.date}
+                            onChange={handleChange}
+
                         />
                     </FormControl>
                     <FormControl
-                    sx={{ paddingBottom:'20px'}}
+                        sx={{ paddingBottom: '20px' }}
                     >
-                        <FormLabel htmlFor="lTag" required>
+                        <FormLabel htmlFor="Tag" required>
                             Tag
                         </FormLabel>
-                        <OutlinedInput
-                            id="Tag"
-                            name="Tag"
-                            type="Tag"
-                            autoComplete="Tag"
-                            required
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={tag}
+                            label="Tag"
+                             onChange={handleTagChange}
                             size="small"
-                        />
+                        >
+                            <MenuItem value={10}>Salary</MenuItem>
+                            <MenuItem value={20}>Freelance</MenuItem>
+                            <MenuItem value={30}>Investment</MenuItem>
+                        </Select>
                     </FormControl>
 
                     <FormControl
-                    sx={{ paddingBottom:'20px'}}
+                        sx={{ paddingBottom: '20px' }}
                     >
-                        <Button variant="contained" fullWidth="false"
-                         sx={{ width: { xs: '100%', sm: 'fit-content' } }}
+                        <Button variant="contained"  onClick={handleSubmit}
+                            sx={{ width: { xs: '100%', sm: 'fit-content' } }}
                         >Add Income</Button>
                     </FormControl>
                 </FormGrid>
@@ -138,8 +182,8 @@ function AddIncomeModal({
 
 
 
-               
-              
+
+
             </Box>
         </Modal>
 
