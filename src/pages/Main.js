@@ -6,7 +6,7 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { SignOutButton } from '@toolpad/core/Account';
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,6 +15,34 @@ import { signOut } from 'firebase/auth';
 import CardDetail from '../components/Card/CardDetail';
 import AddExpenseModal from '../components/Modals/addExpense';
 import AddIncomeModal from '../components/Modals/addIncome';
+import moment from "moment";
+import { addDoc, collection } from "firebase/firestore";
+
+
+
+  // const transactions = [
+  // {
+  //   name: "Pay day",
+  //   type: "income",
+  //   date: "2023-01-15",
+  //   amount: 2000,
+  //   tag: "salary",
+  // },
+  // {
+  //   name: "Dinner",
+  //   type: "expense",
+  //   date: "2023-01-20",
+  //   amount: 500,
+  //   tag: "food",
+  // },
+  // {
+  //   name: "Books",
+  //   type: "expense",
+  //   date: "2023-01-25",
+  //   amount: 300,
+  //   tag: "education",
+  // },
+  // ];
 
 
 const NAVIGATION = [
@@ -133,6 +161,8 @@ function useDemoRouter(initialPath) {
 function Main(props) {
   const { window } = props;
   const router = useDemoRouter('/');
+
+  const [user] = useAuthState(auth);
   const [isExpenseModalVisible, setIsExpenseModalVisible] = React.useState(false);
   const [isIncomeModalVisible, setIsIncomeModalVisible] = React.useState(false);
 
@@ -157,8 +187,37 @@ function Main(props) {
   const demoWindow = window ? window() : undefined;
 
   const onFinish = (values, type) => {
-    console.log('on finishhh', values, type)
+    const newTransaction = {
+      type: type,
+      date: moment(values.date).format("YYYY-MM-DD"),
+      amount: parseFloat(values.amount),
+      tag: values.tag,
+      name: values.name,
+    };
+
+
+    addTransaction(newTransaction);
+   
   };
+  async function addTransaction(transaction) {
+    try {
+      const docRef = await addDoc(
+        collection(db, `users/${user.uid}/transactions`),
+        transaction
+      );
+      console.log("Document written with ID: ", docRef.id);
+      
+        toast.success("Transaction Added!");
+      
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      
+        toast.error("Couldn't add transaction");
+      
+    }
+  }
+
+ 
 
   return (
     <AppProvider
