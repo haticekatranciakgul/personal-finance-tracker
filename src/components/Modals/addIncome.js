@@ -74,7 +74,7 @@ function AddIncomeModal({
     return (
         <Modal
             open={isIncomeModalVisible}
-            onClose={handleIncomeCancel}
+            onCancel={handleIncomeCancel}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -130,8 +130,8 @@ function AddIncomeModal({
                                 label="Select Date"
                                 value={formValues.date}
                                 onChange={handleDateChange}
-                                renderInput={(params) => <OutlinedInput {...params} />}
-                            />
+                                slotProps={{ textField: { size: "small", fullWidth: true } }} // renderInput yerine textField slot'u eklendi
+                                />
                         </LocalizationProvider>
                     </FormControl>
 
