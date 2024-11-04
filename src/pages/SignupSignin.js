@@ -94,8 +94,9 @@ export default function SignUp() {
     setShowCustomTheme((prev) => !prev);
   };
 
-  const signupWithEmail = () => {
+  const signupWithEmail =  async (e) => {
     setLoading(true);
+    e.preventDefault();
     console.log("name", name);
     console.log("email", email);
     console.log("password", password);
@@ -135,11 +136,11 @@ export default function SignUp() {
   };
   
 
-  function loginUsingEmail() {
+  const loginUsingEmail = async (e) => {
     console.log("Email", email);
     console.log("Password", password);
     setLoading(true);
-
+    e.preventDefault();
     if (email !== "" && password !== "") {
 
       signInWithEmailAndPassword(auth, email, password)
@@ -168,7 +169,7 @@ export default function SignUp() {
       toast.error("All fields are mandatory!");
       setLoading(false);
     }
-  }
+  };
 
   async function createDoc(user) {
     setLoading(true);

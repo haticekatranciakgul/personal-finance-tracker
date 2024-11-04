@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { extendTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -16,34 +16,7 @@ import CardDetail from '../components/Card/CardDetail';
 import AddExpenseModal from '../components/Modals/addExpense';
 import AddIncomeModal from '../components/Modals/addIncome';
 import moment from "moment";
-import { addDoc, collection } from "firebase/firestore";
-
-
-
-  // const transactions = [
-  // {
-  //   name: "Pay day",
-  //   type: "income",
-  //   date: "2023-01-15",
-  //   amount: 2000,
-  //   tag: "salary",
-  // },
-  // {
-  //   name: "Dinner",
-  //   type: "expense",
-  //   date: "2023-01-20",
-  //   amount: 500,
-  //   tag: "food",
-  // },
-  // {
-  //   name: "Books",
-  //   type: "expense",
-  //   date: "2023-01-25",
-  //   amount: 300,
-  //   tag: "education",
-  // },
-  // ];
-
+import { addDoc, collection, getDocs, query } from "firebase/firestore";
 
 const NAVIGATION = [
   {
@@ -63,7 +36,7 @@ function Authentication() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useEffect((loading) => {
     if (user) {
       navigate("/dashboard");
     }
@@ -161,7 +134,11 @@ function useDemoRouter(initialPath) {
 function Main(props) {
   const { window } = props;
   const router = useDemoRouter('/');
-
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [income, setIncome] = useState(0);
+  const [expense, setExpense] = useState(0);
+  const [totalBalance, setTotalBalance] = useState(0);
   const [user] = useAuthState(auth);
   const [isExpenseModalVisible, setIsExpenseModalVisible] = React.useState(false);
   const [isIncomeModalVisible, setIsIncomeModalVisible] = React.useState(false);
@@ -183,6 +160,13 @@ function Main(props) {
     setIsIncomeModalVisible(false);
   };
 
+
+  useEffect(() => {
+    //Get all docs from ac ollection
+    fetchTransactions();
+
+  }, []);
+
   // Remove this const when copying and pasting into your project.
   const demoWindow = window ? window() : undefined;
 
@@ -195,29 +179,78 @@ function Main(props) {
       name: values.name,
     };
 
-
+    setTransactions([...transactions, newTransaction]);
+    setIsExpenseModalVisible(false);
+    setIsIncomeModalVisible(false);
     addTransaction(newTransaction);
-   
+    calculateBalance();
+
   };
-  async function addTransaction(transaction) {
+
+  const calculateBalance = () => {
+    let incomeTotal = 0;
+    let expensesTotal = 0;
+
+    transactions.forEach((transaction) => {
+      if (transaction.type === "income") {
+        incomeTotal += transaction.amount;
+      } else {
+        expensesTotal += transaction.amount;
+      }
+    });
+
+    setIncome(incomeTotal);
+    setExpense(expensesTotal);
+    setTotalBalance(incomeTotal - expensesTotal);
+  };
+
+  useEffect(() => {
+    calculateBalance()
+  }, [transactions]);
+
+  async function addTransaction(transaction, many) {
     try {
       const docRef = await addDoc(
         collection(db, `users/${user.uid}/transactions`),
         transaction
       );
       console.log("Document written with ID: ", docRef.id);
-      
+      if(!many) {
         toast.success("Transaction Added!");
+      }
+
       
+      let newArr = transactions;
+      newArr.push(transaction);
+      setTransactions(newArr);
+      calculateBalance();
+
     } catch (e) {
       console.error("Error adding document: ", e);
-      
-        toast.error("Couldn't add transaction");
-      
-    }
-  }
 
- 
+      if (!many) {
+        toast.error("Couldn't add transaction");
+      }
+
+    }
+  };
+
+  async function fetchTransactions() {
+    setLoading(true);
+    if (user) {
+      const q = query(collection(db, `users/${user.uid}/transactions`));
+      const querySnapshot = await getDocs(q);
+      let transactionsArray = [];
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        transactionsArray.push(doc.data());
+      });
+      setTransactions(transactionsArray);
+      console.log("Transactions array", transactionsArray)
+      toast.success("Transactions Fetched!");
+    }
+    setLoading(false);
+  }
 
   return (
     <AppProvider
@@ -234,23 +267,37 @@ function Main(props) {
       <DashboardLayout slots={{ toolbarAccount: Authentication }}>
         <CustomDashboardContainer>
           <PageContainer>
-            <CardDetail
-              showExpenseModal={showExpenseModal}
-              showIncomeModal={showIncomeModal}
-            />
-      
-            <AddExpenseModal
-              isExpenseModalVisible={isExpenseModalVisible}
-              handleExpenseCancel={handleExpenseCancel}
-              onFinish={onFinish}
-              
-            />
-            <AddIncomeModal
-              isIncomeModalVisible={isIncomeModalVisible}
-              handleIncomeCancel={handleIncomeCancel}
-              onFinish={onFinish}
-            />
-            
+
+            {loading ? <p>Loading...</p> :
+
+            <>
+
+              <CardDetail
+                income={income}
+                expense={expense}
+                totalBalance={totalBalance}
+                showExpenseModal={showExpenseModal}
+                showIncomeModal={showIncomeModal}
+              />
+
+              <AddExpenseModal
+                isExpenseModalVisible={isExpenseModalVisible}
+                handleExpenseCancel={handleExpenseCancel}
+                onFinish={onFinish}
+
+              />
+              <AddIncomeModal
+                isIncomeModalVisible={isIncomeModalVisible}
+                handleIncomeCancel={handleIncomeCancel}
+                onFinish={onFinish}
+              />
+
+
+            </>
+
+
+            }
+
           </PageContainer>
         </CustomDashboardContainer>
       </DashboardLayout>

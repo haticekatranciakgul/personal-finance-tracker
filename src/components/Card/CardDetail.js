@@ -7,7 +7,11 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid2';
 
 
-function CardDetail({ showExpenseModal,
+function CardDetail({ 
+    income, 
+    expense, 
+    totalBalance, 
+    showExpenseModal,
     showIncomeModal}) {
 
     return (
@@ -19,7 +23,7 @@ function CardDetail({ showExpenseModal,
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Current Balance
                         </Typography>
-                        <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>7 £</Typography>
+                        <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{totalBalance} £</Typography>
 
                     </CardContent>
                     <CardActions>
@@ -35,11 +39,11 @@ function CardDetail({ showExpenseModal,
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Total Income
                         </Typography>
-                        <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>7 £</Typography>
+                        <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{income} £</Typography>
 
                     </CardContent>
                     <CardActions>
-                        <Button onClick={showIncomeModal} fullWidth variant="contained" size="small">Reset Balance </Button>
+                        <Button onClick={showIncomeModal} fullWidth variant="contained" size="small">Add Income </Button>
                     </CardActions>
                 </Card>
 
@@ -50,10 +54,10 @@ function CardDetail({ showExpenseModal,
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Total Expenses
                         </Typography>
-                        <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>7 £</Typography>
+                        <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{expense} £</Typography>
                     </CardContent>
                     <CardActions>
-                        <Button onClick={showExpenseModal} fullWidth variant="contained" size="small">Reset Balance</Button>
+                        <Button onClick={showExpenseModal} fullWidth variant="contained" size="small">Add Expenses</Button>
                     </CardActions>
                 </Card>
             </Grid>
