@@ -17,6 +17,7 @@ import AddExpenseModal from '../components/Modals/addExpense';
 import AddIncomeModal from '../components/Modals/addIncome';
 import moment from "moment";
 import { addDoc, collection, getDocs, query } from "firebase/firestore";
+import TransactionsTable from '../components/TransactionsTable';
 
 const NAVIGATION = [
   {
@@ -291,6 +292,7 @@ function Main(props) {
                 handleIncomeCancel={handleIncomeCancel}
                 onFinish={onFinish}
               />
+              <TransactionsTable transactions={transactions}></TransactionsTable>
 
 
             </>

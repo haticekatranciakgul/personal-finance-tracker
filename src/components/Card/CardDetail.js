@@ -15,7 +15,7 @@ function CardDetail({
     showIncomeModal}) {
 
     return (
-        <Grid container spacing={1}>
+        <Grid container spacing={1} sx={{marginBottom:'20px'}}>
 
             <Grid size={4}>
                 <Card sx={{ minWidth: 275 }}>
