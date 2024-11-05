@@ -1,37 +1,48 @@
-import React from 'react'
-import TableColumn from '../Table';
+import React from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
-function TransactionsTable({transactions}) {
+function TransactionsTable({ transactions }) {
   const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Type",
-      dataIndex: "type",
-      key: "type",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-    },
-    {
-      title: "Tag",
-      dataIndex: "tag",
-      key: "tag",
-    },
+    { title: "Name", key: "name" },
+    { title: "Type", key: "type" },
+    { title: "Date", key: "date" },
+    { title: "Amount", key: "amount" },
+    { title: "Tag", key: "tag" },
   ];
+
   return (
-   <TableColumn dataSource={transactions} columns={columns}></TableColumn>
-  )
+    <TableContainer component={Paper}>
+      <Table>
+        {/* Tablo Başlıkları */}
+        <TableHead>
+          <TableRow>
+            {columns.map((column) => (
+              <TableCell key={column.key}>{column.title}</TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        
+        {/* Tablo Verileri */}
+        <TableBody>
+          {transactions.map((transaction, index) => (
+            <TableRow key={index}>
+              <TableCell>{transaction.name}</TableCell>
+              <TableCell>{transaction.type}</TableCell>
+              <TableCell>{transaction.date}</TableCell>
+              <TableCell>{transaction.amount}</TableCell>
+              <TableCell>{transaction.tag}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 }
 
-export default TransactionsTable
+export default TransactionsTable;

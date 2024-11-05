@@ -164,9 +164,12 @@ function Main(props) {
 
   useEffect(() => {
     //Get all docs from ac ollection
-    fetchTransactions();
+    if(user){
+      fetchTransactions();
+    }
 
-  }, []);
+
+  }, [user]);
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window ? window() : undefined;
