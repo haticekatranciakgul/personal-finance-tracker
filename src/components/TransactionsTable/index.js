@@ -49,10 +49,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 function TransactionsTable({ transactions }) {
   const [search, setSearch] = useState('');
-  const [age, setAge] = React.useState('');
+  const [typeFilter, seTypeFilter] = React.useState('');
 
   const handleChange = (event) => {
-    setAge(event.target.value);
+    seTypeFilter(event.target.value);
   };
 
   const columns = [
@@ -64,7 +64,7 @@ function TransactionsTable({ transactions }) {
   ];
 
   let filteredTransactions = transactions.filter((item) =>
-    item.name.toLowerCase().includes(search.toLocaleLowerCase())
+    item.name.toLowerCase().includes(search.toLocaleLowerCase()) && item.type.includes(typeFilter)
   );
 
   return (
@@ -89,16 +89,13 @@ function TransactionsTable({ transactions }) {
               <Select
                 labelId="demo-simple-select-filled-label"
                 id="demo-simple-select-filled"
-                value={age}
+                value={typeFilter}
                 onChange={handleChange}
-                sx={{ height: '100%' }} // Select alanının tam yüksekliği kaplamasını sağlıyoruz
+                sx={{ height: '100%',borderRadius:'4px', }}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                <MenuItem value={''}>All</MenuItem>
+                <MenuItem value={'income'}>Income</MenuItem>
+                <MenuItem value={'expense'}> Expense</MenuItem>
               </Select>
             </FormControl>
           </Grid>
