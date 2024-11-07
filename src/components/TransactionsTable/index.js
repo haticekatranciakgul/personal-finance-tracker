@@ -14,6 +14,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Grid from '@mui/material/Grid';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -50,6 +52,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function TransactionsTable({ transactions }) {
   const [search, setSearch] = useState('');
   const [typeFilter, seTypeFilter] = React.useState('');
+  const [sortKey, setSortKey] = useState('');
+
+
+
 
   const handleChange = (event) => {
     seTypeFilter(event.target.value);
@@ -67,9 +73,20 @@ function TransactionsTable({ transactions }) {
     item.name.toLowerCase().includes(search.toLocaleLowerCase()) && item.type.includes(typeFilter)
   );
 
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
+    if (sortKey === "date") {
+      return new Date(a.date) - new Date(b.date);
+    } else if (sortKey === "amount") {
+      return a.amount - b.amount;
+    } else {
+      return 0;
+    }
+  });
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
+
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Search>
@@ -91,7 +108,7 @@ function TransactionsTable({ transactions }) {
                 id="demo-simple-select-filled"
                 value={typeFilter}
                 onChange={handleChange}
-                sx={{ height: '100%',borderRadius:'4px', }}
+                sx={{ height: '100%', borderRadius: '4px', }}
               >
                 <MenuItem value={''}>All</MenuItem>
                 <MenuItem value={'income'}>Income</MenuItem>
@@ -102,9 +119,34 @@ function TransactionsTable({ transactions }) {
         </Grid>
       </Box>
 
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
+
+            <TableRow>
+              <TableCell align="center" colSpan={2}>
+                My Transactions
+              </TableCell>
+              <TableCell align="center" colSpan={2}>
+                <ToggleButtonGroup
+                  color="primary"
+                  value={sortKey}
+                  exclusive
+                  onChange={(e) => setSortKey(e.target.value)}
+                  aria-label="Platform"
+                >
+                  <ToggleButton value="">No Sort</ToggleButton>
+                  <ToggleButton value="date">Sort by Date </ToggleButton>
+                  <ToggleButton value="amount">Sort by Amount</ToggleButton>
+                </ToggleButtonGroup>
+              </TableCell>
+              <TableCell align="center" colSpan={2}>
+                Details
+              </TableCell>
+            </TableRow>
+
+
             <TableRow>
               {columns.map((column) => (
                 <TableCell key={column.key}>{column.title}</TableCell>
@@ -112,7 +154,7 @@ function TransactionsTable({ transactions }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredTransactions.map((transaction, index) => (
+            {sortedTransactions.map((transaction, index) => (
               <TableRow key={index}>
                 <TableCell>{transaction.name}</TableCell>
                 <TableCell>{transaction.type}</TableCell>
