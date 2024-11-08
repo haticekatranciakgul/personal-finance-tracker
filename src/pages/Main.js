@@ -18,6 +18,7 @@ import AddIncomeModal from '../components/Modals/addIncome';
 import moment from "moment";
 import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import TransactionsTable from '../components/TransactionsTable';
+import { unparse } from "papaparse";
 
 const NAVIGATION = [
   {
@@ -132,6 +133,8 @@ function useDemoRouter(initialPath) {
   return router;
 }
 
+
+
 function Main(props) {
   const { window } = props;
   const router = useDemoRouter('/');
@@ -144,7 +147,19 @@ function Main(props) {
   const [isExpenseModalVisible, setIsExpenseModalVisible] = React.useState(false);
   const [isIncomeModalVisible, setIsIncomeModalVisible] = React.useState(false);
 
-
+  function exportToCsv() {
+    const csv = unparse(transactions, {
+      fields: ["name", "type", "date", "amount", "tag"],
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "transactions.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
   const showExpenseModal = () => {
     setIsExpenseModalVisible(true);
   };
@@ -186,6 +201,7 @@ function Main(props) {
     setIsIncomeModalVisible(false);
     addTransaction(newTransaction);
     calculateBalance();
+    console.log("newTransaction:", newTransaction)
 
   };
 
@@ -250,6 +266,8 @@ function Main(props) {
       setTransactions(transactionsArray);
       console.log("Transactions array", transactionsArray)
       toast.success("Transactions Fetched!");
+    }else{
+      toast.error("No User!")
     }
     setLoading(false);
   }
@@ -293,7 +311,11 @@ function Main(props) {
                 handleIncomeCancel={handleIncomeCancel}
                 onFinish={onFinish}
               />
-              <TransactionsTable transactions={transactions}></TransactionsTable>
+              <TransactionsTable transactions={transactions}
+              exportToCsv={exportToCsv}
+
+
+              ></TransactionsTable>
 
 
             </>

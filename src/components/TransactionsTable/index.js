@@ -16,6 +16,12 @@ import Select from '@mui/material/Select';
 import Grid from '@mui/material/Grid';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Button from '@mui/material/Button';
+import { Typography } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import Papa from 'papaparse';
+
+
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -49,7 +55,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function TransactionsTable({ transactions }) {
+function TransactionsTable({ transactions, exportToCsv, setTransactions}) {
   const [search, setSearch] = useState('');
   const [typeFilter, seTypeFilter] = React.useState('');
   const [sortKey, setSortKey] = useState('');
@@ -82,6 +88,19 @@ function TransactionsTable({ transactions }) {
       return 0;
     }
   });
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: (result) => {
+          setTransactions((prevTransactions) => [...prevTransactions, ...result.data]);
+        },
+        skipEmptyLines: true
+      });
+    }
+  };
 
   return (
     <>
@@ -120,13 +139,13 @@ function TransactionsTable({ transactions }) {
       </Box>
 
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
+      <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead >
 
             <TableRow>
-              <TableCell align="center" colSpan={2}>
-                My Transactions
+              <TableCell align="center" colSpan={1}>
+                <Typography variant='h5'>My Transactions</Typography>
               </TableCell>
               <TableCell align="center" colSpan={2}>
                 <ToggleButtonGroup
@@ -136,20 +155,27 @@ function TransactionsTable({ transactions }) {
                   onChange={(e) => setSortKey(e.target.value)}
                   aria-label="Platform"
                 >
-                  <ToggleButton value="">No Sort</ToggleButton>
-                  <ToggleButton value="date">Sort by Date </ToggleButton>
-                  <ToggleButton value="amount">Sort by Amount</ToggleButton>
+                  <ToggleButton size='small' value="">No Sort</ToggleButton>
+                  <ToggleButton size='small' value="date">Sort by Date </ToggleButton>
+                  <ToggleButton size='small' value="amount">Sort by Amount</ToggleButton>
                 </ToggleButtonGroup>
               </TableCell>
               <TableCell align="center" colSpan={2}>
-                Details
+                <Stack spacing={2} direction="row">
+                  <Button variant="outlined" size='small' onClick={exportToCsv}>Export to CSV </Button>
+                 
+                  <Button variant="contained" component="label" size='small'>
+                    Import from CSV
+                    <input type="file" accept=".csv" hidden onChange={handleFileUpload} />
+                  </Button>
+                </Stack>
               </TableCell>
             </TableRow>
 
 
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.key}>{column.title}</TableCell>
+                <TableCell key={column.key} style={{ top: 75, minWidth: column.minWidth }}>{column.title}</TableCell>
               ))}
             </TableRow>
           </TableHead>
