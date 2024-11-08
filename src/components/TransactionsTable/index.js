@@ -20,7 +20,8 @@ import Button from '@mui/material/Button';
 import { Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Papa from 'papaparse';
-
+import { parse } from "papaparse";
+import { toast } from "react-toastify";
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -55,7 +56,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function TransactionsTable({ transactions, exportToCsv, setTransactions}) {
+function TransactionsTable({  transactions,
+  exportToCsv,
+  addTransaction,
+  fetchTransactions,}) {
   const [search, setSearch] = useState('');
   const [typeFilter, seTypeFilter] = React.useState('');
   const [sortKey, setSortKey] = useState('');
@@ -89,18 +93,31 @@ function TransactionsTable({ transactions, exportToCsv, setTransactions}) {
     }
   });
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      Papa.parse(file, {
+  function importFromCsv(event) {
+    event.preventDefault();
+    try {
+      parse(event.target.files[0], {
         header: true,
-        complete: (result) => {
-          setTransactions((prevTransactions) => [...prevTransactions, ...result.data]);
+        complete: async function (results) {
+          // Now results.data is an array of objects representing your CSV rows
+          for (const transaction of results.data) {
+            // Write each transaction to Firebase, you can use the addTransaction function here
+            console.log("Transactions", transaction);
+            const newTransaction = {
+              ...transaction,
+              amount: parseInt(transaction.amount),
+            };
+            await addTransaction(newTransaction, true);
+          }
         },
-        skipEmptyLines: true
       });
+      toast.success("All Transactions Added");
+      fetchTransactions();
+      event.target.files = null;
+    } catch (e) {
+      toast.error(e.message);
     }
-  };
+  }
 
   return (
     <>
@@ -166,7 +183,12 @@ function TransactionsTable({ transactions, exportToCsv, setTransactions}) {
                  
                   <Button variant="contained" component="label" size='small'>
                     Import from CSV
-                    <input type="file" accept=".csv" hidden onChange={handleFileUpload} />
+                    <input  onChange={importFromCsv}
+              id="file-csv"
+              type="file"
+              accept=".csv"
+              required
+              style={{ display: "none" }} />
                   </Button>
                 </Stack>
               </TableCell>

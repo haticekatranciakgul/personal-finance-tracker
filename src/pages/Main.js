@@ -178,8 +178,8 @@ function Main(props) {
 
 
   useEffect(() => {
-   
-    if(user){
+
+    if (user) {
       fetchTransactions();
     }
   }, [user]);
@@ -233,11 +233,11 @@ function Main(props) {
         transaction
       );
       console.log("Document written with ID: ", docRef.id);
-      if(!many) {
+      if (!many) {
         toast.success("Transaction Added!");
       }
 
-      
+
       let newArr = transactions;
       newArr.push(transaction);
       setTransactions(newArr);
@@ -266,12 +266,28 @@ function Main(props) {
       setTransactions(transactionsArray);
       console.log("Transactions array", transactionsArray)
       toast.success("Transactions Fetched!");
-    }else{
+    } else {
       toast.error("No User!")
     }
     setLoading(false);
   }
-
+  async function addTransaction(transaction, many) {
+    try {
+      const docRef = await addDoc(
+        collection(db, `users/${user.uid}/transactions`),
+        transaction
+      );
+      console.log("Document written with ID: ", docRef.id);
+      if (!many) {
+        toast.success("Transaction Added!");
+      }
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      if (!many) {
+        toast.error("Couldn't add transaction");
+      }
+    }
+  }
   return (
     <AppProvider
       navigation={NAVIGATION}
@@ -290,35 +306,38 @@ function Main(props) {
 
             {loading ? <p>Loading...</p> :
 
-            <>
+              <>
 
-              <CardDetail
-                income={income}
-                expense={expense}
-                totalBalance={totalBalance}
-                showExpenseModal={showExpenseModal}
-                showIncomeModal={showIncomeModal}
-              />
+                <CardDetail
+                  income={income}
+                  expense={expense}
+                  totalBalance={totalBalance}
+                  showExpenseModal={showExpenseModal}
+                  showIncomeModal={showIncomeModal}
+                />
 
-              <AddExpenseModal
-                isExpenseModalVisible={isExpenseModalVisible}
-                handleExpenseCancel={handleExpenseCancel}
-                onFinish={onFinish}
+                <AddExpenseModal
+                  isExpenseModalVisible={isExpenseModalVisible}
+                  handleExpenseCancel={handleExpenseCancel}
+                  onFinish={onFinish}
 
-              />
-              <AddIncomeModal
-                isIncomeModalVisible={isIncomeModalVisible}
-                handleIncomeCancel={handleIncomeCancel}
-                onFinish={onFinish}
-              />
-              <TransactionsTable transactions={transactions}
-              exportToCsv={exportToCsv}
+                />
+                <AddIncomeModal
+                  isIncomeModalVisible={isIncomeModalVisible}
+                  handleIncomeCancel={handleIncomeCancel}
+                  onFinish={onFinish}
+                />
+                <TransactionsTable
+                 transactions={transactions}
+                 exportToCsv={exportToCsv}
+                 fetchTransactions={fetchTransactions}
+                 addTransaction={addTransaction}
 
 
-              ></TransactionsTable>
+                ></TransactionsTable>
 
 
-            </>
+              </>
 
 
             }
