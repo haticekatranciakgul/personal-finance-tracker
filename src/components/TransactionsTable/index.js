@@ -26,13 +26,13 @@ import { toast } from "react-toastify";
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  backgroundColor: alpha(theme.palette.common.black, 0.15),
   '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.common.black, 0.25),
   },
   marginBottom: 20,
   width: '100%',
-  height: '40px',  // Sabit yükseklik ekliyoruz
+  height: '40px',
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({

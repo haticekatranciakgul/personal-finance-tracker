@@ -19,6 +19,8 @@ import moment from "moment";
 import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import TransactionsTable from '../components/TransactionsTable';
 import { unparse } from "papaparse";
+import ChartsComponent from '../components/Charts/index';
+
 
 
 const NAVIGATION = [
@@ -319,6 +321,7 @@ function Main(props) {
                   handleIncomeCancel={handleIncomeCancel}
                   onFinish={onFinish}
                 />
+                <ChartsComponent/>
                 <TransactionsTable
                  transactions={transactions}
                  exportToCsv={exportToCsv}
