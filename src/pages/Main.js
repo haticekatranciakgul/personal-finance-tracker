@@ -20,7 +20,7 @@ import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import TransactionsTable from '../components/TransactionsTable';
 import { unparse } from "papaparse";
 import ChartsComponent from '../components/Charts/index';
-
+import NoTransactions from '../components/NoTransactions';
 
 
 const NAVIGATION = [
@@ -213,7 +213,7 @@ function Main(props) {
   const calculateBalance = useCallback(() => {
     let incomeTotal = 0;
     let expensesTotal = 0;
-  
+
     transactions.forEach((transaction) => {
       if (transaction.type === "income") {
         incomeTotal += transaction.amount;
@@ -221,7 +221,7 @@ function Main(props) {
         expensesTotal += transaction.amount;
       }
     });
-  
+
     setIncome(incomeTotal);
     setExpense(expensesTotal);
     setTotalBalance(incomeTotal - expensesTotal);
@@ -274,14 +274,14 @@ function Main(props) {
     }
     setLoading(false);
   }, [user]);
-  
+
   useEffect(() => {
     if (user) {
       fetchTransactions();
     }
   }, [user, fetchTransactions]);
-  
-  
+
+
   return (
     <AppProvider
       navigation={NAVIGATION}
@@ -321,13 +321,20 @@ function Main(props) {
                   handleIncomeCancel={handleIncomeCancel}
                   onFinish={onFinish}
                 />
-                <ChartsComponent/>
-                <TransactionsTable
-                 transactions={transactions}
-                 exportToCsv={exportToCsv}
-                 fetchTransactions={fetchTransactions}
-                 addTransaction={addTransaction}
-                ></TransactionsTable>
+                {transactions.length === 0 ? (
+                  <NoTransactions />)
+                  : (
+                    <>
+                      <ChartsComponent />
+                      <TransactionsTable
+                        transactions={transactions}
+                        exportToCsv={exportToCsv}
+                        fetchTransactions={fetchTransactions}
+                        addTransaction={addTransaction}
+                      ></TransactionsTable>
+                    </>
+                  )
+                }
               </>
             }
           </PageContainer>
