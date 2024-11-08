@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { extendTheme, styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -20,6 +20,7 @@ import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import TransactionsTable from '../components/TransactionsTable';
 import { unparse } from "papaparse";
 
+
 const NAVIGATION = [
   {
     kind: 'header',
@@ -38,11 +39,11 @@ function Authentication() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
-  useEffect((loading) => {
+  useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
-  }, [user, loading]);
+  }, [user, loading, navigate]);
 
   const [session, setSession] = React.useState({
     user: {
@@ -70,6 +71,14 @@ function Authentication() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    } else {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
   function logoutFnc() {
     alert("Logged out successfully!");
     try {
@@ -93,9 +102,10 @@ function Authentication() {
   );
 }
 
-// Mevcut stil kodunu burada kullanıyoruz
+
 const CustomDashboardContainer = styled('div')(({ theme }) => ({
-  minHeight: '100vh',
+  height: '100vh',
+
   padding: theme.spacing(2),
   backgroundImage:
     'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
@@ -177,13 +187,6 @@ function Main(props) {
   };
 
 
-  useEffect(() => {
-
-    if (user) {
-      fetchTransactions();
-    }
-  }, [user]);
-
 
   const demoWindow = window ? window() : undefined;
 
@@ -205,10 +208,10 @@ function Main(props) {
 
   };
 
-  const calculateBalance = () => {
+  const calculateBalance = useCallback(() => {
     let incomeTotal = 0;
     let expensesTotal = 0;
-
+  
     transactions.forEach((transaction) => {
       if (transaction.type === "income") {
         incomeTotal += transaction.amount;
@@ -216,15 +219,15 @@ function Main(props) {
         expensesTotal += transaction.amount;
       }
     });
-
+  
     setIncome(incomeTotal);
     setExpense(expensesTotal);
     setTotalBalance(incomeTotal - expensesTotal);
-  };
+  }, [transactions]);
 
   useEffect(() => {
     calculateBalance()
-  }, [transactions]);
+  }, [transactions, calculateBalance]);
 
   async function addTransaction(transaction, many) {
     try {
@@ -253,41 +256,30 @@ function Main(props) {
     }
   };
 
-  async function fetchTransactions() {
+  const fetchTransactions = useCallback(async () => {
     setLoading(true);
     if (user) {
       const q = query(collection(db, `users/${user.uid}/transactions`));
       const querySnapshot = await getDocs(q);
       let transactionsArray = [];
       querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
         transactionsArray.push(doc.data());
       });
       setTransactions(transactionsArray);
-      console.log("Transactions array", transactionsArray)
       toast.success("Transactions Fetched!");
     } else {
-      toast.error("No User!")
+      toast.error("No User!");
     }
     setLoading(false);
-  }
-  async function addTransaction(transaction, many) {
-    try {
-      const docRef = await addDoc(
-        collection(db, `users/${user.uid}/transactions`),
-        transaction
-      );
-      console.log("Document written with ID: ", docRef.id);
-      if (!many) {
-        toast.success("Transaction Added!");
-      }
-    } catch (e) {
-      console.error("Error adding document: ", e);
-      if (!many) {
-        toast.error("Couldn't add transaction");
-      }
+  }, [user]);
+  
+  useEffect(() => {
+    if (user) {
+      fetchTransactions();
     }
-  }
+  }, [user, fetchTransactions]);
+  
+  
   return (
     <AppProvider
       navigation={NAVIGATION}
@@ -332,16 +324,9 @@ function Main(props) {
                  exportToCsv={exportToCsv}
                  fetchTransactions={fetchTransactions}
                  addTransaction={addTransaction}
-
-
                 ></TransactionsTable>
-
-
               </>
-
-
             }
-
           </PageContainer>
         </CustomDashboardContainer>
       </DashboardLayout>
