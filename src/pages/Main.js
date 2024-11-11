@@ -15,12 +15,12 @@ import { signOut } from 'firebase/auth';
 import CardDetail from '../components/Card/CardDetail';
 import AddExpenseModal from '../components/Modals/addExpense';
 import AddIncomeModal from '../components/Modals/addIncome';
-import moment from "moment";
 import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import TransactionsTable from '../components/TransactionsTable';
 import { unparse } from "papaparse";
 import ChartsComponent from '../components/Charts/index';
 import NoTransactions from '../components/NoTransactions';
+import dayjs from 'dayjs';
 
 
 const NAVIGATION = [
@@ -108,7 +108,6 @@ const CustomDashboardContainer = styled('div')(({ theme }) => ({
   backgroundImage:
     'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
   backgroundRepeat: 'no-repeat',
-  backgroundSize: 'cover', // Arka planın tüm alanı kaplaması için
   ...theme.applyStyles('dark', {
     backgroundImage:
       'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
@@ -188,7 +187,7 @@ function Main(props) {
   const onFinish = (values, type) => {
     const newTransaction = {
       type: type,
-      date: moment(values.date).format("YYYY-MM-DD"),
+      date: dayjs(values.date).format("YYYY-MM-DD"),
       amount: parseFloat(values.amount),
       tag: values.tag,
       name: values.name,

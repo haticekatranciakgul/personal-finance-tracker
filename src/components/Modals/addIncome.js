@@ -15,6 +15,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import {TextField} from '@mui/material';
 
 const FormGrid = styled(Grid)(() => ({
     display: 'flex',
@@ -53,12 +55,6 @@ function AddIncomeModal({
         });
     };
 
-    const handleDateChange = (newValue) => {
-        setFormValues({
-            ...formValues,
-            date: newValue,
-        });
-    };
 
     const handleTagChange = (event) => {
         setTag(event.target.value);
@@ -69,6 +65,14 @@ function AddIncomeModal({
         setFormValues({ name: '', amount: '', date: null });
         setTag('');
         handleIncomeCancel();
+    };
+    const handleDateChange = (newValue) => {
+        if (newValue) {
+            setFormValues({
+                ...formValues,
+                date: dayjs(newValue).format('YYYY-MM-DD'), 
+            });
+        }
     };
 
     return (
@@ -128,9 +132,9 @@ function AddIncomeModal({
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 label="Select Date"
-                                value={formValues.date}
+                                value={formValues.date ? dayjs(formValues.date) : null}
                                 onChange={handleDateChange}
-                                slotProps={{ textField: { size: "small", fullWidth: true } }} // renderInput yerine textField slot'u eklendi
+                                slotProps={{ textField: { size: "small", fullWidth: true } }}
                                 />
                         </LocalizationProvider>
                     </FormControl>
