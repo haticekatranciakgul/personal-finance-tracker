@@ -6,12 +6,31 @@ import Grid from '@mui/material/Grid2';
 import { PieChart } from '@mui/x-charts/PieChart';
 
 
-function ChartsComponent({ transactions }) {
+function ChartsComponent({ sortedTransactions }) {
 
-    const yAxisData = transactions.map(transaction => transaction.amount); // Amount'lar Y ekseni
+    const yAxisData = sortedTransactions.map(transaction => transaction.amount); // Amount'lar Y ekseni
 
-    const xLabels = transactions.map(transaction => transaction.date);
+    const xLabels = sortedTransactions.map(transaction => transaction.date);
+    
 
+    // Harcamaları filtreleyip sadece "expense" türündeki işlemleri almak
+    const spendingData = sortedTransactions.filter(
+        (transaction) => transaction.type === "expense"
+    );
+
+    // PieChart için harcama verilerini gruplama
+    const categoryTotals = spendingData.reduce((acc, transaction) => {
+        const tag = transaction.tag || 'Diğer'; // Tag yoksa 'Diğer' olarak işaretle
+        acc[tag] = (acc[tag] || 0) + transaction.amount;
+        return acc;
+    }, {});
+
+    // PieChart için uygun formata dönüştürme
+    const pieChartData = Object.keys(categoryTotals).map((tag, index) => ({
+        id: index,
+        value: categoryTotals[tag],
+        label: tag,
+    }));
 
     return (
         <Grid container spacing={1} sx={{ marginBottom: '20px' }}>
@@ -34,14 +53,10 @@ function ChartsComponent({ transactions }) {
                 <Card sx={{ width: ' 100%', height: '300px' }}>
                     <CardContent>
 
-                        <PieChart
+                    <PieChart
                             series={[
                                 {
-                                    data: [
-                                        { id: 0, value: 10, label: 'series A' },
-                                        { id: 1, value: 15, label: 'series B' },
-                                        { id: 2, value: 20, label: 'series C' },
-                                    ],
+                                    data: pieChartData,
                                 },
                             ]}
                             width={360}

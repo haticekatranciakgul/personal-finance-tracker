@@ -273,6 +273,12 @@ function Main(props) {
     }
   }, [user, fetchTransactions]);
 
+let sortedTransactions= transactions.sort((a,b) => {
+
+  return new Date(a.date) - new Date (b.date);
+})
+
+
 
   return (
     <AppProvider
@@ -316,7 +322,7 @@ function Main(props) {
                   <NoTransactions />)
                   : (
                     <>
-                     <ChartsComponent transactions={transactions} /> 
+                     <ChartsComponent sortedTransactions={sortedTransactions} /> 
                       <TransactionsTable
                         transactions={transactions}
                         exportToCsv={exportToCsv}
