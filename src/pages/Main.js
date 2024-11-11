@@ -74,12 +74,10 @@ function Authentication() {
   }, []);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/");
-    } else {
-      navigate("/dashboard");
+    if (!user && !loading) {
+      navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   function logoutFnc() {
     alert("Logged out successfully!");
@@ -103,15 +101,14 @@ function Authentication() {
     </AuthenticationContext.Provider>
   );
 }
-
-
 const CustomDashboardContainer = styled('div')(({ theme }) => ({
-  height: '100vh',
-
-  padding: theme.spacing(2),
+  minHeight: '100vh', // Ekranın tamamını kaplaması için minimum yükseklik
+  
+  backgroundSize: 'cover',
   backgroundImage:
     'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
   backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover', // Arka planın tüm alanı kaplaması için
   ...theme.applyStyles('dark', {
     backgroundImage:
       'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
@@ -130,7 +127,6 @@ const demoTheme = extendTheme({
     },
   },
 });
-
 function useDemoRouter(initialPath) {
   const [pathname, setPathname] = React.useState(initialPath);
 
@@ -144,9 +140,6 @@ function useDemoRouter(initialPath) {
 
   return router;
 }
-
-
-
 function Main(props) {
   const { window } = props;
   const router = useDemoRouter('/');
@@ -293,9 +286,8 @@ function Main(props) {
         title: 'Personal Finance Tracker',
       }}
     ><ToastContainer />
-
-      <DashboardLayout slots={{ toolbarAccount: Authentication }}>
-        <CustomDashboardContainer>
+      <CustomDashboardContainer>
+        <DashboardLayout slots={{ toolbarAccount: Authentication }}>
           <PageContainer>
 
             {loading ? <p>Loading...</p> :
@@ -338,8 +330,8 @@ function Main(props) {
               </>
             }
           </PageContainer>
-        </CustomDashboardContainer>
-      </DashboardLayout>
+        </DashboardLayout>
+      </CustomDashboardContainer>
     </AppProvider>
   )
 }
