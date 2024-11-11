@@ -316,7 +316,7 @@ function Main(props) {
                   <NoTransactions />)
                   : (
                     <>
-                      <ChartsComponent />
+                     <ChartsComponent transactions={transactions} /> 
                       <TransactionsTable
                         transactions={transactions}
                         exportToCsv={exportToCsv}

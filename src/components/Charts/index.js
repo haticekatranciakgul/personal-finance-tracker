@@ -6,7 +6,13 @@ import Grid from '@mui/material/Grid2';
 import { PieChart } from '@mui/x-charts/PieChart';
 
 
-function ChartsComponent() {
+function ChartsComponent({ transactions }) {
+
+    const yAxisData = transactions.map(transaction => transaction.amount); // Amount'lar Y ekseni
+
+    const xLabels = transactions.map(transaction => transaction.date);
+
+
     return (
         <Grid container spacing={1} sx={{ marginBottom: '20px' }}>
             <Grid size={8}>
@@ -14,14 +20,12 @@ function ChartsComponent() {
                     <CardContent>
 
                         <LineChart
-                            xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-                            series={[
-                                {
-                                    data: [2, 5.5, 2, 8.5, 1.5, 5],
-                                },
-                            ]}
-                            width={700}
+                            width={500}
                             height={300}
+                            series={[
+                                { data: yAxisData, label: 'amount' },
+                            ]}
+                            xAxis={[{ scaleType: 'point', data: xLabels }]}
                         />
                     </CardContent>
                 </Card>
