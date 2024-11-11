@@ -34,12 +34,12 @@ function ChartsComponent({ sortedTransactions }) {
 
     return (
         <Grid container spacing={1} sx={{ marginBottom: '20px' }}>
-            <Grid size={8}>
+            <Grid  size={{ xs: 12, md: 12, lg: 8 }}>
                 <Card sx={{ width: ' 100%', height: '300px' }}>
                     <CardContent>
 
                         <LineChart
-                            width={500}
+                            
                             height={300}
                             series={[
                                 { data: yAxisData, label: 'amount' },
@@ -49,7 +49,7 @@ function ChartsComponent({ sortedTransactions }) {
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid size={4}>
+            <Grid  size={{ xs: 12, md: 12, lg: 4 }}>
                 <Card sx={{ width: ' 100%', height: '300px' }}>
                     <CardContent>
 
@@ -57,9 +57,10 @@ function ChartsComponent({ sortedTransactions }) {
                             series={[
                                 {
                                     data: pieChartData,
+                                    outerRadius: 90,
                                 },
                             ]}
-                            width={360}
+                            width={380}
                             height={250}
                         />
                     </CardContent>

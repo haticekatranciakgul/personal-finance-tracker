@@ -17,9 +17,9 @@ function CardDetail({
     return (
         <Grid container spacing={1} sx={{marginBottom:'20px'}}>
 
-            <Grid size={4}>
-                <Card sx={{ minWidth: 275 }}>
-                    <CardContent>
+            <Grid  size={{ xs: 12, md: 4, lg: 4 }}>
+                <Card >
+                    <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Current Balance
                         </Typography>
@@ -33,9 +33,9 @@ function CardDetail({
 
 
             </Grid>
-            <Grid size={4}>
-                <Card sx={{ minWidth: 275 }}>
-                    <CardContent>
+            <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+                <Card >
+                    <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Total Income
                         </Typography>
@@ -48,9 +48,9 @@ function CardDetail({
                 </Card>
 
             </Grid>
-            <Grid size={4}>
-                <Card sx={{ minWidth: 275 }}>
-                    <CardContent>
+            <Grid size={{ xs: 12, md: 4, lg: 4}}>
+            <Card >
+                    <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Total Expenses
                         </Typography>
