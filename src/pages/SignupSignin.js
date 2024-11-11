@@ -94,7 +94,7 @@ export default function SignUp() {
     setShowCustomTheme((prev) => !prev);
   };
 
-  const signupWithEmail =  async (e) => {
+  const signupWithEmail = async (e) => {
     setLoading(true);
     e.preventDefault();
     console.log("name", name);
@@ -108,7 +108,7 @@ export default function SignUp() {
             const user = userCredential.user;
             console.log("user", user);
             toast.success("USER created!", {
-              autoClose: 5000, 
+              autoClose: 5000,
             });
             setLoading(false);
             setName("");
@@ -134,7 +134,7 @@ export default function SignUp() {
       setLoading(false);
     }
   };
-  
+
 
   const loginUsingEmail = async (e) => {
     console.log("Email", email);
@@ -145,12 +145,12 @@ export default function SignUp() {
 
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          
+
           const user = userCredential.user;
           navigate("/dashboard");
 
           toast.success("User Logged In!", {
-            autoClose: 5000, 
+            autoClose: 5000,
           });
           toast.success("User Logged In!");
           console.log("User Logged In : ", user);
@@ -163,12 +163,15 @@ export default function SignUp() {
             error.message
           );
           setLoading(false);
-          
+
         });
     } else {
       toast.error("All fields are mandatory!");
+
       setLoading(false);
     }
+
+
   };
 
   async function createDoc(user) {
@@ -189,7 +192,7 @@ export default function SignUp() {
         console.log("Doc created!");
 
         toast.success("Doc createddddd!", {
-          autoClose: 5000, 
+          autoClose: 5000,
         });
         setLoading(false);
 
@@ -209,35 +212,35 @@ export default function SignUp() {
 
   function googleAuth() {
     setLoading(true);
-    try{
+    try {
       signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        const user = result.user;
-        console.log("token", token)
-        console.log("user>>>", user);
-        createDoc(user);
-        navigate("/dashboard");
-        toast.success("User authenticated!")
+        .then((result) => {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          const user = result.user;
+          console.log("token", token)
+          console.log("user>>>", user);
+          createDoc(user);
+          navigate("/dashboard");
+          toast.success("User authenticated!")
 
-      }).catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log("errorCode>>", errorCode)
-        toast.error(errorMessage)
-      });
+        }).catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log("errorCode>>", errorCode)
+          toast.error(errorMessage)
+        });
 
-    }catch(e){
+    } catch (e) {
       toast.error(e.message);
 
     }
-   
+
 
   };
 
   return (
-    <><ToastContainer />
+    <>
       {loginForm ?
         <>
           {/* login */}
@@ -263,7 +266,7 @@ export default function SignUp() {
                     onSubmit={handleSubmit}
                     sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                   >
-
+                    <ToastContainer />
                     <FormControl>
                       <FormLabel htmlFor="email">Email</FormLabel>
                       <TextField
@@ -345,7 +348,7 @@ export default function SignUp() {
               <CssBaseline enableColorScheme />
               <SignUpContainer direction="column" justifyContent="space-between">
                 <Card variant="outlined">
-
+                  <ToastContainer />
                   <Typography
                     component="h1"
                     variant="h4"
