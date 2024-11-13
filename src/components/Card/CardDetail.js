@@ -17,7 +17,7 @@ function CardDetail({
     return (
         <Grid container spacing={1} sx={{marginBottom:'20px'}}>
 
-            <Grid  size={{ xs: 12, md: 4, lg: 4 }}>
+            <Grid  size={{ xs: 12, sm:12 , md: 4, lg: 4 , xl:4}}>
                 <Card sx={{ height: 200 }}>
                     <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
@@ -33,7 +33,7 @@ function CardDetail({
 
 
             </Grid>
-            <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+            <Grid size={{ xs: 12, sm:6, md: 4, lg: 4 ,xl:4 }}>
                 <Card sx={{ height: 200 }}>
                     <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
@@ -48,7 +48,7 @@ function CardDetail({
                 </Card>
 
             </Grid>
-            <Grid size={{ xs: 12, md: 4, lg: 4}}>
+            <Grid size={{ xs: 12, sm:6, md: 4, lg: 4 ,xl:4}}>
             <Card sx={{ height: 200 }} >
                     <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
