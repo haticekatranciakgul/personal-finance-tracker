@@ -18,7 +18,7 @@ function CardDetail({
         <Grid container spacing={1} sx={{marginBottom:'20px'}}>
 
             <Grid  size={{ xs: 12, md: 4, lg: 4 }}>
-                <Card >
+                <Card sx={{ height: 200 }}>
                     <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Current Balance
@@ -26,7 +26,7 @@ function CardDetail({
                         <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{totalBalance} £</Typography>
 
                     </CardContent>
-                    <CardActions>
+                    <CardActions sx={{ height: 50 }}>
                         <Button  fullWidth variant="contained" size="small">Reset Balance</Button>
                     </CardActions>
                 </Card>
@@ -34,7 +34,7 @@ function CardDetail({
 
             </Grid>
             <Grid size={{ xs: 12, md: 4, lg: 4 }}>
-                <Card >
+                <Card sx={{ height: 200 }}>
                     <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Total Income
@@ -42,21 +42,21 @@ function CardDetail({
                         <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{income} £</Typography>
 
                     </CardContent>
-                    <CardActions>
+                    <CardActions sx={{ height: 50 }}>
                         <Button onClick={showIncomeModal} fullWidth variant="contained" size="small">Add Income </Button>
                     </CardActions>
                 </Card>
 
             </Grid>
             <Grid size={{ xs: 12, md: 4, lg: 4}}>
-            <Card >
+            <Card sx={{ height: 200 }} >
                     <CardContent sx={{ height: 150 }}>
                         <Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 25 }}>
                             Total Expenses
                         </Typography>
                         <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{expense} £</Typography>
                     </CardContent>
-                    <CardActions>
+                    <CardActions sx={{ height: 50 }}>
                         <Button onClick={showExpenseModal} fullWidth variant="contained" size="small">Add Expenses</Button>
                     </CardActions>
                 </Card>

@@ -21,6 +21,7 @@ import { unparse } from "papaparse";
 import ChartsComponent from '../components/Charts/index';
 import NoTransactions from '../components/NoTransactions';
 import dayjs from 'dayjs';
+import { Typography, useMediaQuery, useTheme } from '@mui/material';
 
 
 const NAVIGATION = [
@@ -278,6 +279,9 @@ let sortedTransactions= transactions.sort((a,b) => {
   return new Date(a.date) - new Date (b.date);
 })
 
+const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // 600 px altı
+  const isExtraSmallScreen = useMediaQuery('(max-width:375px)'); // 375 px altı
 
 
   return (
@@ -288,7 +292,20 @@ let sortedTransactions= transactions.sort((a,b) => {
       window={demoWindow}
       branding={{
         logo: false,
-        title: 'Personal Finance Tracker',
+        title: (
+          <Typography
+            variant="h6"
+            style={{
+              fontSize: isSmallScreen ? '16px' : '24px', 
+              display: isExtraSmallScreen ? 'none' : 'block', 
+              position: 'static',
+              transform: 'translateX(0%)',
+              
+            }}
+          >
+            Personal Finance Tracker
+          </Typography>
+        ),
       }}
     ><ToastContainer />
       <CustomDashboardContainer>
