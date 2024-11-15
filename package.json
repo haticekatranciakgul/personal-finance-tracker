@@ -1,4 +1,5 @@
 {
+  "homepage": "https://haticekatranciakgul.github.io/personal-finance-tracker",
   "name": "personal_finance-tracker",
   "version": "0.1.0",
   "private": true,
@@ -15,6 +16,7 @@
     "@toolpad/core": "^0.8.1",
     "dayjs": "^1.11.13",
     "firebase": "^10.14.1",
+    "gh-pages": "^6.2.0",
     "moment": "^2.30.1",
     "papaparse": "^5.4.1",
     "react": "^18.3.1",
@@ -29,7 +31,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
