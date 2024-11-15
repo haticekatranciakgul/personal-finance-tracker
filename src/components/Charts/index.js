@@ -60,7 +60,7 @@ function ChartsComponent({ sortedTransactions }) {
                                     outerRadius: 90,
                                 },
                             ]}
-                            width={380}
+                          
                             height={250}
                         />
                     </CardContent>
