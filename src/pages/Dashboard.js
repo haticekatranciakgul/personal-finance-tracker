@@ -301,7 +301,7 @@ const isExtraSmallScreen = useMediaQuery("(max-width:320px)");
           <Typography variant="h6" 
           sx={{ marginLeft: 0,
             fontSize: isSmallScreen ? "12px" : "20px" ,
-            marginRight: isMediumScreen ?  isSmallScreen ?  (isExtraSmallScreen ? "160px" : "230px") : "170px"  : "350px" ,
+            marginRight: isMediumScreen ?  isSmallScreen ?  (isExtraSmallScreen ? "160px" : "215px") : "170px"  : "350px" ,
             
 
 
