@@ -23,6 +23,8 @@ import NoTransactions from '../components/NoTransactions';
 import dayjs from 'dayjs';
 import { Typography } from '@mui/material';
 import {Box} from '@mui/material';
+import { useMediaQuery } from "@mui/material";
+
 
 const NAVIGATION = [
   {
@@ -280,6 +282,11 @@ let sortedTransactions= transactions.sort((a,b) => {
 })
 
 
+const isMediumScreen = useMediaQuery("(max-width:425px)");
+const isSmallScreen = useMediaQuery("(max-width:375px)");
+const isExtraSmallScreen = useMediaQuery("(max-width:320px)");
+
+
 
   return (
     <AppProvider
@@ -288,9 +295,17 @@ let sortedTransactions= transactions.sort((a,b) => {
       theme={demoTheme}
       window={demoWindow}
       branding={{
+        logo:false,
         title: (
           <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '100%' }}>
-          <Typography variant="h6" sx={{ marginLeft: 0 }}>
+          <Typography variant="h6" 
+          sx={{ marginLeft: 0,
+            fontSize: isSmallScreen ? "12px" : "20px" ,
+            marginRight: isMediumScreen ?  isSmallScreen ?  (isExtraSmallScreen ? "160px" : "230px") : "170px"  : "350px" ,
+            
+
+
+            }}>
             Personal Finance Tracker
           </Typography>
         </Box>
