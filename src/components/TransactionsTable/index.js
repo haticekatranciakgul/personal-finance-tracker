@@ -196,7 +196,7 @@ function TransactionsTable({  transactions,
 
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.key} style={{ top: 75, minWidth: column.minWidth }}>{column.title}</TableCell>
+                <TableCell key={column.key} style={{ top: '27%', minWidth: column.minWidth }}>{column.title}</TableCell>
               ))}
             </TableRow>
           </TableHead>
